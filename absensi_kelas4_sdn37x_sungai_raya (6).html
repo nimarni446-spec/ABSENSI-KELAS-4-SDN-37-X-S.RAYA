@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absensi Kelas 4 — SDN 37/X Sungai Raya</title>
+<style>
+:root{--navy:#183b56;--blue:#247ba0;--sky:#eaf6fb;--green:#2a9d8f;--orange:#f4a261;--red:#e76f51;--ink:#243746;--muted:#6b7c89;--line:#dce7ed;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:#f3f8fb;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+header{background:linear-gradient(120deg,#183b56,#247ba0);color:white;padding:28px 18px 34px}
+.head{max-width:1100px;margin:auto;display:flex;gap:16px;align-items:center}.logo{width:62px;height:62px;border-radius:18px;background:#ffffff20;display:grid;place-items:center;font-size:30px;border:1px solid #ffffff50}
+h1{font-size:clamp(22px,4vw,32px);margin:0 0 7px}.sub{opacity:.9;font-size:15px}
+main{max-width:1100px;margin:-17px auto 40px;padding:0 16px}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 25px #183b5610;margin-bottom:18px}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:end;justify-content:space-between}
+.field{display:flex;flex-direction:column;gap:7px;min-width:190px;flex:1}label{font-size:13px;font-weight:700;color:var(--muted)}
+input[type=date],input[type=text],select{font:inherit;border:1px solid #cbdbe4;border-radius:10px;padding:11px 12px;background:white;color:var(--ink);min-width:0;width:100%}
+button{font:inherit;border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;transition:.15s}
+button:hover{filter:brightness(.96);transform:translateY(-1px)}.primary{background:var(--blue);color:white}.secondary{background:var(--sky);color:var(--navy)}.danger{background:#fff0ed;color:#a33d2a}
+.actions{display:flex;gap:9px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.stat{background:white;border:1px solid var(--line);border-radius:15px;padding:16px}.stat .label{font-size:13px;color:var(--muted)}.stat strong{display:block;font-size:27px;margin-top:6px}.stat:nth-child(1) strong{color:var(--green)}.stat:nth-child(2) strong{color:var(--orange)}.stat:nth-child(3) strong{color:var(--red)}.stat:nth-child(4) strong{color:var(--blue)}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:600px}th{text-align:left;background:#f3f8fb;color:#526a79;font-size:12px;text-transform:uppercase;letter-spacing:.04em}th,td{padding:12px 10px;border-bottom:1px solid #e8eff3}td:first-child{color:var(--muted);width:55px}td input{min-width:130px}td select{min-width:130px}.note{font-size:13px;color:var(--muted);line-height:1.5;margin:12px 0 0}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:8px 16px 28px}
+@media(max-width:650px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:15px}.head{align-items:flex-start}.logo{width:50px;height:50px;flex-shrink:0}}
+@media print{body{background:white}header{padding:15px;background:white!important;color:#183b56;border-bottom:2px solid #183b56}.logo,.actions,.note,.toolbar button{display:none!important}main{margin:12px auto}.panel,.stat{box-shadow:none;border:1px solid #ccc}.stats{gap:6px}.stat{padding:9px}.stat strong{font-size:18px}input,select{border:0!important;padding:0!important;appearance:none;background:transparent!important}footer{display:none}}
+</style>
+</head>
+<body>
+<header><div class="head"><div class="logo">📚</div><div><h1>Absensi Siswa Kelas 4</h1><div class="sub">SDN 37/X Sungai Raya · Tahun Pelajaran 2026/2027</div></div></div></header>
+<main>
+<section class="panel">
+ <div class="toolbar">
+  <div class="field"><label for="tanggal">TANGGAL ABSENSI</label><input type="date" id="tanggal"></div>
+  <div class="field"><label for="guru">NAMA WALI KELAS (OPSIONAL)</label><input type="text" id="guru" placeholder="Masukkan nama wali kelas"></div>
+  <div class="actions"><button class="secondary" onclick="setAll('Hadir')">Semua Hadir</button><button class="primary" onclick="window.print()">Cetak Absensi</button></div>
+ </div>
+ <p class="note">Isi nama 13 siswa, lalu pilih status kehadiran. Data tersimpan otomatis di browser pada perangkat ini.</p>
+</section>
+<section class="stats" aria-label="Ringkasan kehadiran">
+ <div class="stat"><span class="label">Hadir</span><strong id="countHadir">13</strong></div>
+ <div class="stat"><span class="label">Sakit</span><strong id="countSakit">0</strong></div>
+ <div class="stat"><span class="label">Izin</span><strong id="countIzin">0</strong></div>
+ <div class="stat"><span class="label">Alpa</span><strong id="countAlpa">0</strong></div>
+</section>
+<section class="panel">
+ <div class="toolbar" style="margin-bottom:14px"><div><h2 style="margin:0 0 5px;font-size:20px">Daftar Kehadiran</h2><div class="sub" style="color:var(--muted)">Jumlah siswa: 13 orang</div></div><div class="actions"><button class="secondary" onclick="exportCSV()">Unduh CSV</button><button class="danger" onclick="resetData()">Reset Data</button></div></div>
+ <div class="table-wrap"><table><thead><tr><th>No.</th><th>Nama Siswa</th><th>Status Kehadiran</th><th>Keterangan (opsional)</th></tr></thead><tbody id="studentRows"></tbody></table></div>
+</section>
+</main>
+<footer>Absensi Kelas 4 · SDN 37/X Sungai Raya</footer>
+<script>
+const STORAGE_KEY='absensi_kelas4_sdn37x_sungairaya_v1';
+const statuses=['Hadir','Sakit','Izin','Alpa'];
+const today=new Date();document.getElementById('tanggal').value=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+let students=Array.from({length:13},(_,i)=>({name:`Siswa ${i+1}`,status:'Hadir',note:''}));
+function load(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));if(saved&&Array.isArray(saved.students)&&saved.students.length===13){students=saved.students;document.getElementById('tanggal').value=saved.date||document.getElementById('tanggal').value;document.getElementById('guru').value=saved.teacher||''}}catch(e){}}
+function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({students,date:document.getElementById('tanggal').value,teacher:document.getElementById('guru').value}))}catch(e){}}
+function render(){const tbody=document.getElementById('studentRows');tbody.innerHTML='';students.forEach((s,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td><input type="text" aria-label="Nama siswa ${i+1}" value="${escapeHTML(s.name)}" data-index="${i}" data-field="name"></td><td><select aria-label="Status siswa ${i+1}" data-index="${i}" data-field="status">${statuses.map(st=>`<option ${s.status===st?'selected':''}>${st}</option>`).join('')}</select></td><td><input type="text" aria-label="Keterangan siswa ${i+1}" placeholder="Contoh: demam" value="${escapeHTML(s.note||'')}" data-index="${i}" data-field="note"></td>`;tbody.appendChild(tr)});updateCounts()}
+function escapeHTML(str){return String(str??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function updateCounts(){statuses.forEach(st=>{const el=document.getElementById('count'+st);if(el)el.textContent=students.filter(s=>s.status===st).length})}
+function setAll(status){students.forEach(s=>s.status=status);save();render()}
+function resetData(){if(confirm('Kembalikan daftar ke 13 nama contoh dan status Hadir? Data absensi saat ini akan dihapus.')){students=Array.from({length:13},(_,i)=>({name:`Siswa ${i+1}`,status:'Hadir',note:''}));document.getElementById('guru').value='';save();render()}}
+function exportCSV(){const rows=[['No','Nama Siswa','Status Kehadiran','Keterangan','Tanggal','Wali Kelas'],...students.map((s,i)=>[i+1,s.name,s.status,s.note||'',document.getElementById('tanggal').value,document.getElementById('guru').value])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='absensi-kelas-4-sdn-37x-sungai-raya.csv';a.click();URL.revokeObjectURL(url)}
+document.getElementById('studentRows').addEventListener('input',e=>{const el=e.target;if(el.dataset.index!==undefined){students[Number(el.dataset.index)][el.dataset.field]=el.value;save();updateCounts()}});
+document.getElementById('studentRows').addEventListener('change',e=>{const el=e.target;if(el.dataset.index!==undefined){students[Number(el.dataset.index)][el.dataset.field]=el.value;save();updateCounts()}});
+document.getElementById('tanggal').addEventListener('change',save);document.getElementById('guru').addEventListener('input',save);
+load();render();
+</script>
+</body>
+</html>
